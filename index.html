@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>UTSC Mgmt Weekly</title>
+<meta name="description" content="Management club events, deadlines and recruiting at UTSC. Curated weekly by MESA.">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+<style>
+:root{
+  --bg:#fff; --text:#1d1d1f; --sub:#6e6e73; --faint:#aeaeb2; --line:rgba(60,60,67,.14);
+  --fill:#f2f2f7; --accent:#007aff; --red:#ff3b30; --today:#ff3b30;
+}
+@media (prefers-color-scheme:dark){
+  :root{--bg:#000; --text:#f5f5f7; --sub:#98989d; --faint:#636366; --line:rgba(84,84,88,.6);
+    --fill:#1c1c1e; --accent:#0a84ff; --red:#ff453a; --today:#ff453a}
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-padding-top:190px}
+body{background:var(--bg);color:var(--text);font:15px/1.4 -apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+button,select{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+.wrap{max-width:1040px;margin:0 auto;padding:0 16px}
+
+/* top */
+.top{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom:.5px solid var(--line)}
+.bar{display:flex;align-items:center;justify-content:space-between;padding:12px 0 4px}
+.bar h1{font-size:20px;font-weight:700;letter-spacing:-.02em}
+.bar .by{font-size:13px;color:var(--sub);font-weight:400;letter-spacing:0}
+.month{font-size:13px;color:var(--sub);display:flex;align-items:center;gap:2px}
+.month button{width:28px;height:28px;border-radius:50%;color:var(--accent);font-size:20px;line-height:1}
+.month button:disabled{color:var(--faint);cursor:default}
+
+.strip{display:grid;grid-template-columns:repeat(7,1fr);text-align:center;padding:4px 0 8px;max-width:560px}
+.d{display:flex;flex-direction:column;align-items:center;gap:3px;padding:2px 0}
+.d .w{font-size:11px;color:var(--sub);text-transform:uppercase}
+.d .n{width:34px;height:34px;line-height:34px;border-radius:50%;font-size:17px}
+.d.today .n{background:var(--today);color:#fff;font-weight:600}
+.d.has{cursor:pointer}
+.d.has:not(.today):hover .n{background:var(--fill)}
+.d .dots{display:flex;gap:2px;height:5px}
+.d .dots i{width:5px;height:5px;border-radius:50%}
+.d:not(.has):not(.today) .n{color:var(--faint)}
+
+.tools{display:flex;gap:6px;align-items:center;overflow-x:auto;scrollbar-width:none;padding:0 0 10px}
+.tools::-webkit-scrollbar{display:none}
+.chip{white-space:nowrap;font-size:13px;padding:5px 11px;border-radius:8px;background:var(--fill)}
+.chip[aria-pressed="true"]{background:var(--text);color:var(--bg)}
+.yr{font-size:13px;padding:5px 10px;border-radius:8px;background:var(--fill);-webkit-appearance:none;appearance:none;flex-shrink:0}
+.sep{width:.5px;height:18px;background:var(--line);flex-shrink:0;margin:0 2px}
+.status{font-size:12px;color:var(--sub);padding:0 0 10px;display:none}
+.status.on{display:block}
+.status button{color:var(--accent);font-size:12px}
+
+.seg{display:none;background:var(--fill);border-radius:9px;padding:2px;margin:0 0 10px}
+.seg button{flex:1;font-size:13px;font-weight:500;padding:6px;border-radius:7px}
+.seg button[aria-pressed="true"]{background:var(--bg);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+
+/* layout */
+.cols{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:48px;padding:0 0 64px}
+.colh{font-size:13px;font-weight:600;color:var(--sub);text-transform:uppercase;letter-spacing:.03em;padding:24px 0 6px;border-bottom:.5px solid var(--line)}
+@media (max-width:860px){
+  .cols{grid-template-columns:minmax(0,1fr);gap:0}
+  .seg{display:flex}
+  .cols[data-tab="clubs"] #careersCol,.cols[data-tab="careers"] #clubsCol{display:none}
+  #careersCol .colh{display:none}
+}
+
+/* agenda */
+.dayh{display:flex;align-items:baseline;gap:8px;padding:24px 0 6px;border-bottom:.5px solid var(--line)}
+.dayh b{font-size:17px;font-weight:600}
+.dayh span{font-size:15px;color:var(--sub)}
+.dayh .rel{margin-left:auto;font-size:13px;color:var(--today);font-weight:500}
+.week-break{font-size:13px;font-weight:600;color:var(--sub);text-transform:uppercase;letter-spacing:.03em;padding:36px 0 0}
+
+.ev{display:grid;grid-template-columns:64px 3px minmax(0,1fr) auto;gap:12px;align-items:start;padding:12px 0;border-bottom:.5px solid var(--line)}
+.ev .when{font-size:12px;color:var(--sub);padding-top:2px;line-height:1.3}
+.ev .when.close{color:var(--red);font-weight:600}
+.ev .bar-c{border-radius:2px;align-self:stretch}
+.ev .club{font-size:13px;color:var(--sub)}
+.ev .t{font-size:16px;font-weight:500;line-height:1.3;margin:1px 0 3px}
+.ev .meta{font-size:13px;color:var(--sub)}
+.ev .meta .warn{color:var(--red)}
+.ev .go{display:flex;flex-direction:column;align-items:flex-end;gap:6px;padding-top:1px}
+.ev .go a{font-size:15px;color:var(--accent);font-weight:500;white-space:nowrap}
+.ev .go button{font-size:12px;color:var(--sub);white-space:nowrap}
+.ev .go button:hover{color:var(--accent)}
+.ev.past{opacity:.4}
+.none{color:var(--sub);font-size:14px;padding:24px 0}
+@media (max-width:480px){.ev{grid-template-columns:52px 3px minmax(0,1fr) auto;gap:10px}}
+
+/* careers */
+#careersCol .ev{grid-template-columns:3px minmax(0,1fr) auto}
+.note{font-size:12px;color:var(--sub);padding:14px 0;line-height:1.5}
+
+footer{border-top:.5px solid var(--line);padding:20px 0 40px;font-size:12px;color:var(--sub)}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <div class="bar">
+      <h1>Mgmt Weekly <span class="by">by MESA</span></h1>
+      <div class="month">
+        <button id="prev" aria-label="Previous week">‹</button>
+        <span id="range"></span>
+        <button id="next" aria-label="Next week">›</button>
+      </div>
+    </div>
+    <div class="strip" id="strip"></div>
+    <div class="tools" id="tools"></div>
+    <div class="status" id="status"></div>
+    <div class="seg" id="seg">
+      <button data-tab="clubs" aria-pressed="true">Club Events</button>
+      <button data-tab="careers" aria-pressed="false">Careers</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="cols" id="cols" data-tab="clubs">
+    <div id="clubsCol"></div>
+    <aside id="careersCol">
+      <div class="colh">Careers &amp; Recruiting</div>
+      <div id="careers"></div>
+      <p class="note">Hosted by firms and professional bodies. Spots fill fast.</p>
+    </aside>
+  </div>
+</main>
+
+<footer><div class="wrap">Curated weekly by MESA, UTSC. Missing an event? Message MESA on Instagram.</div></footer>
+
+<script src="data.js"></script>
+<script>
+const INTERESTS = [
+  ["finance","Finance"],["accounting","Accounting"],["marketing","Marketing"],["cases","Case Comps"],
+  ["hr","HR"],["tech","Tech & AI"],["networking","Networking"],["social","Social"],["roles","Club Roles"]
+];
+const LABEL = Object.fromEntries(INTERESTS);
+const COLORS = ["#ff9500","#34c759","#007aff","#af52de","#ff2d55","#5ac8fa","#ffcc00","#a2845e","#5856d6"];
+const KEY = "mgmtweekly.v2";
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+let st = {tags: [], year: ""};
+try { Object.assign(st, JSON.parse(localStorage.getItem(KEY)) || {}); } catch (e) {}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (e) {} };
+
+// dates
+const P = d => { const [y,m,x] = d.split("-").map(Number); return new Date(y, m-1, x); };
+const iso = t => `${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,"0")}-${String(t.getDate()).padStart(2,"0")}`;
+const add = (d, n) => { const t = P(d); t.setDate(t.getDate() + n); return iso(t); };
+const TODAY = iso(new Date());
+const diff = d => Math.round((P(d) - P(TODAY)) / 864e5);
+const fmt = (d, o) => P(d).toLocaleDateString("en-US", o);
+
+// club colour: stable per club name
+const colorOf = name => { let h = 0; for (const c of name) h = (h * 31 + c.charCodeAt(0)) >>> 0; return COLORS[h % COLORS.length]; };
+
+const visible = it => {
+  if (st.year && it.years && !it.years.includes(+st.year)) return false;
+  if (st.tags.length && !(it.tags || []).some(t => st.tags.includes(t))) return false;
+  return true;
+};
+
+// each item lands on one calendar day
+const anchor = it => it.date || it.registerBy || null;
+const whenText = it => {
+  if (it.kind === "deadline") return {text: "Closes", cls: "close"};
+  if (!it.date && it.registerBy) return {text: "Sign-up closes", cls: "close"};
+  return {text: "All day", cls: ""};
+};
+
+const metaLine = it => {
+  const bits = [];
+  if (it.date && it.registerBy) bits.push(esc(`Register by ${fmt(it.registerBy, {month:"short", day:"numeric"})}`));
+  if (it.years) bits.push(it.years[0] >= 3 ? "3rd year +" : it.years.map(y => ["1st","2nd","3rd","4th"][y-1]).join(" & ") + " years");
+  if (it.fewSpots) bits.push(`<span class="warn">Few spots left</span>`);
+  bits.push(...(it.tags || []).map(t => esc(LABEL[t] || t)));
+  return bits.join(" · ");
+};
+
+function evRow(it, withWhen) {
+  const w = whenText(it), a = anchor(it);
+  const past = a && diff(a) < 0;
+  return `<div class="ev${past ? " past" : ""}">
+    ${withWhen ? `<div class="when ${w.cls}">${w.text}</div>` : ""}
+    <div class="bar-c" style="background:${colorOf(it.club)}"></div>
+    <div>
+      <div class="club">${esc(it.club)}</div>
+      <div class="t">${esc(it.title)}</div>
+      <div class="meta">${!withWhen && a ? esc(fmt(a, {weekday:"short", month:"short", day:"numeric"})) + " · " : ""}${metaLine(it)}</div>
+    </div>
+    <div class="go">
+      <a href="${esc(it.link)}" target="_blank" rel="noopener">${it.kind === "deadline" ? "Apply" : "Register"}</a>
+      ${a ? `<button data-cal="${it.id}">Add to Calendar</button>` : ""}
+    </div>
+  </div>`;
+}
+
+// week strip
+let viewStart = WEEK.start;
+const firstWeek = WEEK.start;
+const lastDate = WEEK.items.map(anchor).filter(Boolean).sort().pop() || WEEK.end;
+
+function renderStrip() {
+  const clubs = WEEK.items.filter(i => i.section === "club" && visible(i));
+  const end = add(viewStart, 6);
+  const sameMonth = P(viewStart).getMonth() === P(end).getMonth();
+  $("#range").textContent = `${fmt(viewStart, {month:"short", day:"numeric"})} – ${fmt(end, sameMonth ? {day:"numeric"} : {month:"short", day:"numeric"})}`;
+  $("#prev").disabled = viewStart <= firstWeek;
+  $("#next").disabled = end >= lastDate;
+  let html = "";
+  for (let i = 0; i < 7; i++) {
+    const d = add(viewStart, i);
+    const on = clubs.filter(it => anchor(it) === d);
+    html += `<div class="d${d === TODAY ? " today" : ""}${on.length ? " has" : ""}" ${on.length ? `data-jump="${d}"` : ""}>
+      <span class="w">${fmt(d, {weekday:"short"}).slice(0, 3)}</span>
+      <span class="n">${P(d).getDate()}</span>
+      <span class="dots">${on.slice(0, 3).map(it => `<i style="background:${colorOf(it.club)}"></i>`).join("")}</span>
+    </div>`;
+  }
+  $("#strip").innerHTML = html;
+}
+
+function renderTools() {
+  $("#tools").innerHTML =
+    `<select class="yr" id="year" aria-label="Your year">
+      <option value="">Any year</option>${[1,2,3,4].map(y => `<option value="${y}" ${+st.year === y ? "selected" : ""}>${["1st","2nd","3rd","4th+"][y-1]} year</option>`).join("")}
+    </select><span class="sep"></span>` +
+    INTERESTS.map(([id, l]) => `<button class="chip" data-tag="${id}" aria-pressed="${st.tags.includes(id)}">${l}</button>`).join("");
+  $("#year").onchange = e => { st.year = e.target.value; save(); renderAll(); };
+}
+
+function renderStatus() {
+  const total = WEEK.items.length, shown = WEEK.items.filter(visible).length;
+  const on = st.tags.length || st.year;
+  $("#status").className = "status" + (on ? " on" : "");
+  $("#status").innerHTML = on ? `Showing ${shown} of ${total} · saved for next time · <button id="reset">Clear</button>` : "";
+}
+
+function renderClubs() {
+  const items = WEEK.items.filter(i => i.section === "club" && visible(i) && anchor(i))
+    .sort((a, b) => anchor(a).localeCompare(anchor(b)));
+  if (!items.length) { $("#clubsCol").innerHTML = `<p class="none">No club events match your filters.</p>`; return; }
+  const days = {};
+  items.forEach(i => (days[anchor(i)] = days[anchor(i)] || []).push(i));
+  let out = "", brokeWeek = false;
+  for (const [d, its] of Object.entries(days)) {
+    if (!brokeWeek && d > WEEK.end) { out += `<div class="week-break">Coming up</div>`; brokeWeek = true; }
+    const n = diff(d);
+    const rel = n === 0 ? "Today" : n === 1 ? "Tomorrow" : "";
+    out += `<div class="dayh" id="day-${d}"><b>${fmt(d, {weekday:"long"})}</b><span>${fmt(d, {month:"short", day:"numeric"})}</span>${rel ? `<span class="rel">${rel}</span>` : ""}</div>`;
+    out += its.map(it => evRow(it, true)).join("");
+  }
+  $("#clubsCol").innerHTML = out;
+}
+
+function renderCareers() {
+  const items = WEEK.items.filter(i => i.section === "career" && visible(i))
+    .sort((a, b) => (anchor(a) || "9").localeCompare(anchor(b) || "9"));
+  $("#careers").innerHTML = items.length ? items.map(it => evRow(it, false)).join("") : `<p class="none">Nothing matches your filters.</p>`;
+}
+
+function renderAll() { renderStrip(); renderTools(); renderStatus(); renderClubs(); renderCareers(); }
+
+function ics(it) {
+  const d = anchor(it); if (!d) return;
+  const s = d.replace(/-/g, ""), e = add(d, 1).replace(/-/g, "");
+  const title = (it.kind === "deadline" ? "Deadline: " : !it.date ? "Sign-up closes: " : "") + `${it.club} – ${it.title}`;
+  const body = ["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//MESA//Mgmt Weekly//EN","BEGIN:VEVENT",
+    `UID:${it.id}@mgmtweekly`,`DTSTAMP:${s}T000000Z`,`DTSTART;VALUE=DATE:${s}`,`DTEND;VALUE=DATE:${e}`,
+    `SUMMARY:${title}`,`URL:${it.link}`,`DESCRIPTION:${it.link}`,"END:VEVENT","END:VCALENDAR"].join("\r\n");
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([body], {type:"text/calendar"}));
+  a.download = `${it.id}.ics`; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
+function setTab(tab) {
+  $("#cols").dataset.tab = tab;
+  document.querySelectorAll("#seg button").forEach(b => b.setAttribute("aria-pressed", b.dataset.tab === tab));
+}
+
+document.addEventListener("click", e => {
+  const t = e.target.closest("[data-tag],[data-cal],[data-jump],[data-tab],#reset,#prev,#next");
+  if (!t) return;
+  if (t.dataset.tag) { const id = t.dataset.tag; st.tags = st.tags.includes(id) ? st.tags.filter(x => x !== id) : [...st.tags, id]; save(); renderAll(); }
+  else if (t.dataset.cal) ics(WEEK.items.find(i => i.id === t.dataset.cal));
+  else if (t.dataset.jump) { setTab("clubs"); document.getElementById("day-" + t.dataset.jump)?.scrollIntoView({behavior:"smooth"}); }
+  else if (t.dataset.tab) setTab(t.dataset.tab);
+  else if (t.id === "reset") { st = {tags: [], year: ""}; save(); renderAll(); }
+  else if (t.id === "prev") { viewStart = add(viewStart, -7); renderStrip(); }
+  else if (t.id === "next") { viewStart = add(viewStart, 7); renderStrip(); }
+});
+
+renderAll();
+</script>
+</body>
+</html>
